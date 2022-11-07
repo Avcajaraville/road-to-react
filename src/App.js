@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-const title = 'My hacker stories';
-
-const Search = () => {
+const Search = (props) => {
   console.log('Rendering Search');
   const [searchTerm, setSeachTerm] = React.useState('');
   const handleChange = (event) => {
-    setSeachTerm(event.target.value);
-  }
+    setSeachTerm(event.target.value)
+    props.onSearch(event);
+  };
+
   return (
     <div>
       <label htmlFor="search">Search:</label>
@@ -43,6 +43,7 @@ const Item = (props) => {
 
 const App = () => {
   console.log('Rendering App');
+  const title = 'My hacker stories';
   const stories = [{
     title: 'React',
     url: 'https://reactjs.org',
@@ -58,11 +59,14 @@ const App = () => {
     points: 5,
     objectId: 1,
   }];
+  const handleChange = (event) => {
+    console.log(event.target.value);
+  };
 
   return (
     <div>
       <h1>{title}</h1>
-      <Search />
+      <Search onSearch={handleChange}/>
       <List list={stories} />
     </div >
   );
