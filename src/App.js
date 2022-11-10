@@ -4,12 +4,7 @@ const Search = ({ search, onSearch }) => {
   return (
     <div>
       <label htmlFor="search">Search:</label>
-      <input
-        id="search"
-        type="text"
-        value={search}
-        onChange={onSearch}
-      />
+      <input id="search" type="text" value={search} onChange={onSearch} />
     </div>
   );
 };
@@ -17,7 +12,7 @@ const Search = ({ search, onSearch }) => {
 const List = ({ list }) => {
   return (
     <ul>
-      {list.map(({ objectId, ...item}) => (
+      {list.map(({ objectId, ...item }) => (
         <Item key={objectId} {...item} />
       ))}
     </ul>
@@ -58,11 +53,20 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSeachTerm] = React.useState("React");
+  const [searchTerm, setSeachTerm] = React.useState(
+    localStorage.getItem("search") ?? "React"
+  );
   const handleChange = (event) => {
     setSeachTerm(event.target.value);
   };
-  const searchedStories = stories.filter(story => searchTerm && story.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  React.useEffect(() => {
+    localStorage.setItem("search", searchTerm);
+  }, [searchTerm]);
+
+  const searchedStories = stories.filter(
+    (story) =>
+      searchTerm && story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
