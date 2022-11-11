@@ -32,6 +32,18 @@ const Item = ({ author, title, url, num_comments, points }) => {
   );
 };
 
+const useLocalStorageState = (key, initialValue) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) ?? initialValue
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [key, value]);
+
+  return [value, setValue];
+};
+
 const App = () => {
   const title = "My hacker stories";
   const stories = [
@@ -53,15 +65,10 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSeachTerm] = React.useState(
-    localStorage.getItem("search") ?? "React"
-  );
+  const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
   const handleChange = (event) => {
     setSeachTerm(event.target.value);
   };
-  React.useEffect(() => {
-    localStorage.setItem("search", searchTerm);
-  }, [searchTerm]);
 
   const searchedStories = stories.filter(
     (story) =>
