@@ -1,9 +1,15 @@
 import * as React from "react";
 
-const InputWithLabel = ({ id, label, value, onInputChange, type = "text" }) => {
+const InputWithLabel = ({
+  id,
+  value,
+  onInputChange,
+  type = "text",
+  children,
+}) => {
   return (
     <>
-      <label htmlFor="{id}">{label}</label>
+      <label htmlFor="{id}">{children}</label>
       <input id="{id}" type="{type}" value={value} onChange={onInputChange} />
     </>
   );
@@ -78,7 +84,14 @@ const App = () => {
   return (
     <>
       <h1>{title}</h1>
-      <InputWithLabel id="search" label="Search:" value={searchTerm} onInputChange={handleSearch} />
+      <InputWithLabel
+        id="search"
+        label="Search:"
+        value={searchTerm}
+        onInputChange={handleSearch}
+      >
+        Search:
+      </InputWithLabel>
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
