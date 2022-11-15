@@ -1,10 +1,10 @@
 import * as React from "react";
 
-const Search = ({ search, onSearch }) => {
+const InputWithLabel = ({ id, label, value, onInputChange, type = "text" }) => {
   return (
     <>
-      <label htmlFor="search">Search:</label>
-      <input id="search" type="text" value={search} onChange={onSearch} />
+      <label htmlFor="{id}">{label}</label>
+      <input id="{id}" type="{type}" value={value} onChange={onInputChange} />
     </>
   );
 };
@@ -66,7 +66,7 @@ const App = () => {
   ];
 
   const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
-  const handleChange = (event) => {
+  const handleSearch = (event) => {
     setSeachTerm(event.target.value);
   };
 
@@ -78,7 +78,7 @@ const App = () => {
   return (
     <>
       <h1>{title}</h1>
-      <Search onSearch={handleChange} search={searchTerm} />
+      <InputWithLabel id="search" label="Search:" value={searchTerm} onInputChange={handleSearch} />
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
