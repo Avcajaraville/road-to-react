@@ -2,10 +2,10 @@ import * as React from "react";
 
 const Search = ({ search, onSearch }) => {
   return (
-    <div>
+    <>
       <label htmlFor="search">Search:</label>
       <input id="search" type="text" value={search} onChange={onSearch} />
-    </div>
+    </>
   );
 };
 
@@ -76,14 +76,14 @@ const App = () => {
   );
 
   return (
-    <div>
+    <>
       <h1>{title}</h1>
       <Search onSearch={handleChange} search={searchTerm} />
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
       <List list={searchedStories} />
-    </div>
+    </>
   );
 };
 
