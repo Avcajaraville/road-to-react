@@ -1,43 +1,5 @@
 import * as React from "react";
 
-const InputWithLabel = ({
-  id,
-  value,
-  onInputChange,
-  type = "text",
-  children,
-}) => {
-  return (
-    <>
-      <label htmlFor="{id}">{children}</label>
-      <input id="{id}" type="{type}" value={value} onChange={onInputChange} />
-    </>
-  );
-};
-
-const List = ({ list }) => {
-  return (
-    <ul>
-      {list.map(({ objectId, ...item }) => (
-        <Item key={objectId} {...item} />
-      ))}
-    </ul>
-  );
-};
-
-const Item = ({ author, title, url, num_comments, points }) => {
-  return (
-    <li>
-      <span>
-        <a href={url}>{title}</a>
-      </span>
-      <span>{author}</span>
-      <span>{num_comments}</span>
-      <span>{points}</span>
-    </li>
-  );
-};
-
 const useLocalStorageState = (key, initialValue) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) ?? initialValue
@@ -50,36 +12,42 @@ const useLocalStorageState = (key, initialValue) => {
   return [value, setValue];
 };
 
+const initialStories = [
+  {
+    title: "React",
+    url: "https://reactjs.org",
+    author: "Jordan Walke",
+    num_comments: 3,
+    points: 4,
+    objectId: 0,
+  },
+  {
+    title: "Redux",
+    url: "https://redux.js.org",
+    author: "Dan Abramov, Andrew Clark",
+    num_comments: 2,
+    points: 5,
+    objectId: 1,
+  },
+];
+
 const App = () => {
   const title = "My hacker stories";
-  const stories = [
-    {
-      title: "React",
-      url: "https://reactjs.org",
-      author: "Jordan Walke",
-      num_comments: 3,
-      points: 4,
-      objectId: 0,
-    },
-    {
-      title: "Redux",
-      url: "https://redux.js.org",
-      author: "Dan Abramov, Andrew Clark",
-      num_comments: 2,
-      points: 5,
-      objectId: 1,
-    },
-  ];
-
   const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
   const handleSearch = (event) => {
     setSeachTerm(event.target.value);
   };
-
+  const [stories, setStories] = React.useState(initialStories);
   const searchedStories = stories.filter(
     (story) =>
       searchTerm && story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const removeStories = (item) => {
+    const newStories = stories.filter(
+      (story) => story.objectId !== item.objectId
+    );
+    setStories(newStories);
+  };
 
   return (
     <>
@@ -95,8 +63,49 @@ const App = () => {
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
-      <List list={searchedStories} />
+      <List list={searchedStories} onRemove={removeStories} />
     </>
+  );
+};
+
+const InputWithLabel = ({
+  id,
+  value,
+  onInputChange,
+  type = "text",
+  children,
+}) => {
+  return (
+    <>
+      <label htmlFor="{id}">{children}</label>
+      <input id="{id}" type="{type}" value={value} onChange={onInputChange} />
+    </>
+  );
+};
+
+const List = ({ list, onRemove }) => {
+  return (
+    <ul>
+      {list.map((item) => (
+        <Item key={item.objectId} item={item} onRemove={onRemove} />
+      ))}
+    </ul>
+  );
+};
+
+const Item = ({ item, onRemove }) => {
+  return (
+    <li>
+      <span>
+        <a href={item.url}>{item.title}</a>
+      </span>
+      <span>{item.author}</span>
+      <span>{item.num_comments}</span>
+      <span>{item.points}</span>
+      <span>
+        <button onClick={() => onRemove(item)}>Remove item</button>
+      </span>
+    </li>
   );
 };
 
