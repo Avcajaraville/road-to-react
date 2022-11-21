@@ -13,7 +13,11 @@ const useLocalStorageState = (key, initialValue) => {
 };
 
 const getAsyncStories = async () =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
+    const randomError = Math.random() < 0.5;
+    if (randomError) {
+      throw new Error();
+    }
     window.setTimeout(() => {
       resolve({
         data: {
@@ -43,20 +47,34 @@ const getAsyncStories = async () =>
 const App = () => {
   const title = "My hacker stories";
   const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
+  const [stories, setStories] = React.useState([]);
+  const [isLoading, setLoading] = React.useState(false);
+  const [isError, setError] = React.useState(false);
+
+  React.useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const response = await getAsyncStories();
+        setStories(response.data.stories);
+      } catch (err) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
   const handleSearch = (event) => {
     setSeachTerm(event.target.value);
   };
-  const [stories, setStories] = React.useState([]);
-  React.useEffect(() => {
-    (async () => {
-      const response = await getAsyncStories();
-      setStories(response.data.stories);
-    })();
-  }, []);
+
   const searchedStories = stories.filter(
     (story) =>
       searchTerm && story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const removeStories = (item) => {
     const newStories = stories.filter(
       (story) => story.objectId !== item.objectId
@@ -78,6 +96,8 @@ const App = () => {
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
+      {isLoading && <p>Fetching data...</p>}
+      {isError && <p>Unexpected error!</p>}
       <List list={searchedStories} onRemove={removeStories} />
     </>
   );
