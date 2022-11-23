@@ -1,5 +1,7 @@
 import * as React from "react";
 
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+
 const useLocalStorageState = (key, initialValue) => {
   const [value, setValue] = React.useState(
     localStorage.getItem(key) ?? initialValue
@@ -31,7 +33,7 @@ const storiesReducer = (state, action) => {
       return {
         ...state,
         data: state.data.filter(
-          (story) => story.objectId !== action.payload.objectId
+          (story) => story.objectID !== action.payload.objectID
         ),
         isLoading: false,
         isError: false,
@@ -47,37 +49,9 @@ const storiesReducer = (state, action) => {
   }
 };
 
-const getAsyncStories = async () => {
-  return new Promise((resolve, reject) => {
-    const randomError = Math.random() < 0.5;
-    if (randomError) {
-      throw new Error();
-    }
-    window.setTimeout(() => {
-      resolve({
-        data: {
-          stories: [
-            {
-              title: "React",
-              url: "https://reactjs.org",
-              author: "Jordan Walke",
-              num_comments: 3,
-              points: 4,
-              objectId: 0,
-            },
-            {
-              title: "Redux",
-              url: "https://redux.js.org",
-              author: "Dan Abramov, Andrew Clark",
-              num_comments: 2,
-              points: 5,
-              objectId: 1,
-            },
-          ],
-        },
-      });
-    }, 1000);
-  });
+const getAsyncStories = async (query) => {
+  const data = await fetch(`${API_ENDPOINT}${query}`);
+  return data.json();
 };
 
 const App = () => {
@@ -95,10 +69,10 @@ const App = () => {
         type: "STORIES_FETCHING",
       });
       try {
-        const response = await getAsyncStories();
+        const response = await getAsyncStories(searchTerm);
         dispatchStories({
           type: "STORIES_FETCH_SUCCESS",
-          payload: response.data.stories,
+          payload: response.hits,
         });
       } catch (err) {
         dispatchStories({
@@ -106,16 +80,11 @@ const App = () => {
         });
       }
     })();
-  }, []);
+  }, [searchTerm]);
 
   const handleSearch = (event) => {
     setSeachTerm(event.target.value);
   };
-
-  const searchedStories = stories.data.filter(
-    (story) =>
-      searchTerm && story.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const removeStories = (item) => {
     dispatchStories({
@@ -140,7 +109,7 @@ const App = () => {
       </p>
       {stories.isLoading && <p>Fetching data...</p>}
       {stories.isError && <p>Unexpected error!</p>}
-      <List list={searchedStories} onRemove={removeStories} />
+      <List list={stories.data} onRemove={removeStories} />
     </>
   );
 };
@@ -164,7 +133,7 @@ const List = ({ list, onRemove }) => {
   return (
     <ul>
       {list.map((item) => (
-        <Item key={item.objectId} item={item} onRemove={onRemove} />
+        <Item key={item.objectID} item={item} onRemove={onRemove} />
       ))}
     </ul>
   );
