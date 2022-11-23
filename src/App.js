@@ -14,12 +14,34 @@ const useLocalStorageState = (key, initialValue) => {
 
 const storiesReducer = (state, action) => {
   switch (action.type) {
-    case "SET_STORIES":
-      return action.payload;
+    case "STORIES_FETCHING":
+      return {
+        ...state,
+        isLoading: true,
+        isError: false,
+      };
+    case "STORIES_FETCH_SUCCESS":
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
+        isError: false,
+      };
     case "REMOVE_STORY":
-      return state.filter(
-        (story) => story.objectId !== action.payload.objectId
-      );
+      return {
+        ...state,
+        data: state.data.filter(
+          (story) => story.objectId !== action.payload.objectId
+        ),
+        isLoading: false,
+        isError: false,
+      };
+    case "STORIES_FETCH_ERROR":
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+      };
     default:
       throw new Error(`action ${action.type} not recognized`);
   }
@@ -54,31 +76,34 @@ const getAsyncStories = async () => {
           ],
         },
       });
-    }, 3000);
+    }, 1000);
   });
 };
 
 const App = () => {
   const title = "My hacker stories";
   const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
-  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
-  const [isLoading, setLoading] = React.useState(false);
-  const [isError, setError] = React.useState(false);
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
 
   React.useEffect(() => {
     (async () => {
-      setLoading(true);
-      setError(false);
+      dispatchStories({
+        type: "STORIES_FETCHING",
+      });
       try {
         const response = await getAsyncStories();
         dispatchStories({
-          type: "SET_STORIES",
+          type: "STORIES_FETCH_SUCCESS",
           payload: response.data.stories,
         });
       } catch (err) {
-        setError(true);
-      } finally {
-        setLoading(false);
+        dispatchStories({
+          type: "STORIES_FETCH_ERROR",
+        });
       }
     })();
   }, []);
@@ -87,7 +112,7 @@ const App = () => {
     setSeachTerm(event.target.value);
   };
 
-  const searchedStories = stories.filter(
+  const searchedStories = stories.data.filter(
     (story) =>
       searchTerm && story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -113,8 +138,8 @@ const App = () => {
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
-      {isLoading && <p>Fetching data...</p>}
-      {isError && <p>Unexpected error!</p>}
+      {stories.isLoading && <p>Fetching data...</p>}
+      {stories.isError && <p>Unexpected error!</p>}
       <List list={searchedStories} onRemove={removeStories} />
     </>
   );
