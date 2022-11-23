@@ -12,8 +12,21 @@ const useLocalStorageState = (key, initialValue) => {
   return [value, setValue];
 };
 
-const getAsyncStories = async () =>
-  new Promise((resolve, reject) => {
+const storiesReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_STORIES":
+      return action.payload;
+    case "REMOVE_STORY":
+      return state.filter(
+        (story) => story.objectId !== action.payload.objectId
+      );
+    default:
+      throw new Error(`action ${action.type} not recognized`);
+  }
+};
+
+const getAsyncStories = async () => {
+  return new Promise((resolve, reject) => {
     const randomError = Math.random() < 0.5;
     if (randomError) {
       throw new Error();
@@ -43,11 +56,12 @@ const getAsyncStories = async () =>
       });
     }, 3000);
   });
+};
 
 const App = () => {
   const title = "My hacker stories";
   const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
-  const [stories, setStories] = React.useState([]);
+  const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
   const [isLoading, setLoading] = React.useState(false);
   const [isError, setError] = React.useState(false);
 
@@ -57,7 +71,10 @@ const App = () => {
       setError(false);
       try {
         const response = await getAsyncStories();
-        setStories(response.data.stories);
+        dispatchStories({
+          type: "SET_STORIES",
+          payload: response.data.stories,
+        });
       } catch (err) {
         setError(true);
       } finally {
@@ -76,10 +93,10 @@ const App = () => {
   );
 
   const removeStories = (item) => {
-    const newStories = stories.filter(
-      (story) => story.objectId !== item.objectId
-    );
-    setStories(newStories);
+    dispatchStories({
+      type: "REMOVE_STORY",
+      payload: item,
+    });
   };
 
   return (
