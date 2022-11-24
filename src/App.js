@@ -63,8 +63,13 @@ const App = () => {
     isError: false,
   });
 
-  React.useEffect(() => {
+  const handleFetchStories = React.useCallback(() => {
     (async () => {
+      console.log('stuff');
+      if (!searchTerm) {
+        return;
+      }
+
       dispatchStories({
         type: "STORIES_FETCHING",
       });
@@ -81,6 +86,10 @@ const App = () => {
       }
     })();
   }, [searchTerm]);
+
+  React.useEffect(() => {
+    handleFetchStories();
+  }, [handleFetchStories]);
 
   const handleSearch = (event) => {
     setSeachTerm(event.target.value);
