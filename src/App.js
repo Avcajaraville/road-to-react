@@ -49,14 +49,16 @@ const storiesReducer = (state, action) => {
   }
 };
 
-const getAsyncStories = async (query) => {
-  const data = await fetch(`${API_ENDPOINT}${query}`);
+const getAsyncStories = async (url) => {
+  const data = await fetch(url);
   return data.json();
 };
 
 const App = () => {
   const title = "My hacker stories";
   const [searchTerm, setSeachTerm] = useLocalStorageState("search", "React");
+  const [url, setUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
+
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     data: [],
     isLoading: false,
@@ -65,16 +67,11 @@ const App = () => {
 
   const handleFetchStories = React.useCallback(() => {
     (async () => {
-      console.log('stuff');
-      if (!searchTerm) {
-        return;
-      }
-
       dispatchStories({
         type: "STORIES_FETCHING",
       });
       try {
-        const response = await getAsyncStories(searchTerm);
+        const response = await getAsyncStories(url);
         dispatchStories({
           type: "STORIES_FETCH_SUCCESS",
           payload: response.hits,
@@ -85,7 +82,12 @@ const App = () => {
         });
       }
     })();
-  }, [searchTerm]);
+  }, [url]);
+
+  const handleSubmitSearch = (event) => {
+    event.preventDefault();
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
 
   React.useEffect(() => {
     handleFetchStories();
@@ -105,14 +107,17 @@ const App = () => {
   return (
     <>
       <h1>{title}</h1>
-      <InputWithLabel
-        id="search"
-        label="Search:"
-        value={searchTerm}
-        onInputChange={handleSearch}
-      >
-        Search:
-      </InputWithLabel>
+      <form onSubmit={handleSubmitSearch}>
+        <InputWithLabel
+          id="search"
+          label="Search:"
+          value={searchTerm}
+          onInputChange={handleSearch}
+        >
+          Search:
+        </InputWithLabel>
+        <button disabled={!searchTerm}>Search</button>
+      </form>
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
