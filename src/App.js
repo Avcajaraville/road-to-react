@@ -84,7 +84,7 @@ const App = () => {
     })();
   }, [url]);
 
-  const handleSubmitSearch = (event) => {
+  const handleSearchSubmit = (event) => {
     event.preventDefault();
     setUrl(`${API_ENDPOINT}${searchTerm}`);
   };
@@ -93,11 +93,11 @@ const App = () => {
     handleFetchStories();
   }, [handleFetchStories]);
 
-  const handleSearch = (event) => {
+  const handleSearchInputChange = (event) => {
     setSeachTerm(event.target.value);
   };
 
-  const removeStories = (item) => {
+  const handleRemoveStories = (item) => {
     dispatchStories({
       type: "REMOVE_STORY",
       payload: item,
@@ -107,24 +107,40 @@ const App = () => {
   return (
     <>
       <h1>{title}</h1>
-      <form onSubmit={handleSubmitSearch}>
-        <InputWithLabel
-          id="search"
-          label="Search:"
-          value={searchTerm}
-          onInputChange={handleSearch}
-        >
-          Search:
-        </InputWithLabel>
-        <button disabled={!searchTerm}>Search</button>
-      </form>
+      <SearchForm
+        searchTerm={searchTerm}
+        onSearchInput={handleSearchInputChange}
+        onSearchSubmit={handleSearchSubmit}
+      />
       <p>
         Seaching for: <strong>{searchTerm}</strong>
       </p>
       {stories.isLoading && <p>Fetching data...</p>}
       {stories.isError && <p>Unexpected error!</p>}
-      <List list={stories.data} onRemove={removeStories} />
+      <List list={stories.data} onRemove={handleRemoveStories} />
     </>
+  );
+};
+
+const SearchForm = ({
+  searchTerm,
+  onSearchInput,
+  onSearchSubmit
+}) => {
+  return (
+    <form onSubmit={onSearchSubmit}>
+      <InputWithLabel
+        id="search"
+        label="Search:"
+        value={searchTerm}
+        onInputChange={onSearchInput}
+      >
+        Search:
+      </InputWithLabel>
+      <button type="submit" disabled={!searchTerm}>
+        Search
+      </button>
+    </form>
   );
 };
 
