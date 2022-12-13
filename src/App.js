@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ReactComponent as Check } from "./check.svg";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -188,7 +189,7 @@ const Item = ({ item, onRemove }) => {
       <span>{item.points}</span>
       <span>
         <button className="button button--small" onClick={() => onRemove(item)}>
-          Remove item
+          <Check height="1rem" width="1rem" />
         </button>
       </span>
     </li>
