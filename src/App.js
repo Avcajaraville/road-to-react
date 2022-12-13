@@ -105,8 +105,8 @@ const App = () => {
   };
 
   return (
-    <>
-      <h1>{title}</h1>
+    <div className="container">
+      <h1 className="h1">{title}</h1>
       <SearchForm
         searchTerm={searchTerm}
         onSearchInput={handleSearchInputChange}
@@ -118,17 +118,13 @@ const App = () => {
       {stories.isLoading && <p>Fetching data...</p>}
       {stories.isError && <p>Unexpected error!</p>}
       <List list={stories.data} onRemove={handleRemoveStories} />
-    </>
+    </div>
   );
 };
 
-const SearchForm = ({
-  searchTerm,
-  onSearchInput,
-  onSearchSubmit
-}) => {
+const SearchForm = ({ searchTerm, onSearchInput, onSearchSubmit }) => {
   return (
-    <form onSubmit={onSearchSubmit}>
+    <form onSubmit={onSearchSubmit} className="search-form">
       <InputWithLabel
         id="search"
         label="Search:"
@@ -137,7 +133,11 @@ const SearchForm = ({
       >
         Search:
       </InputWithLabel>
-      <button type="submit" disabled={!searchTerm}>
+      <button
+        className="button button--large"
+        type="submit"
+        disabled={!searchTerm}
+      >
         Search
       </button>
     </form>
@@ -153,15 +153,23 @@ const InputWithLabel = ({
 }) => {
   return (
     <>
-      <label htmlFor="{id}">{children}</label>
-      <input id="{id}" type="{type}" value={value} onChange={onInputChange} />
+      <label htmlFor={id} className="label">
+        {children}
+      </label>
+      <input
+        className="input"
+        id={id}
+        type={type}
+        value={value}
+        onChange={onInputChange}
+      />
     </>
   );
 };
 
 const List = ({ list, onRemove }) => {
   return (
-    <ul>
+    <ul className="list">
       {list.map((item) => (
         <Item key={item.objectID} item={item} onRemove={onRemove} />
       ))}
@@ -171,7 +179,7 @@ const List = ({ list, onRemove }) => {
 
 const Item = ({ item, onRemove }) => {
   return (
-    <li>
+    <li className="item">
       <span>
         <a href={item.url}>{item.title}</a>
       </span>
@@ -179,7 +187,9 @@ const Item = ({ item, onRemove }) => {
       <span>{item.num_comments}</span>
       <span>{item.points}</span>
       <span>
-        <button onClick={() => onRemove(item)}>Remove item</button>
+        <button className="button button--small" onClick={() => onRemove(item)}>
+          Remove item
+        </button>
       </span>
     </li>
   );
