@@ -4,12 +4,18 @@ import { ReactComponent as Check } from "./check.svg";
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
 const useLocalStorageState = (key, initialValue) => {
+  const isMounted = React.useRef(false);
   const [value, setValue] = React.useState(
     localStorage.getItem(key) ?? initialValue
   );
 
   React.useEffect(() => {
-    localStorage.setItem(key, value);
+    if (!isMounted.current) {
+      isMounted.current = true;
+    } else {
+      console.log("SETTING LOCAL STORAGE");
+      localStorage.setItem(key, value);
+    }
   }, [key, value]);
 
   return [value, setValue];
@@ -98,16 +104,23 @@ const App = () => {
     setSeachTerm(event.target.value);
   };
 
-  const handleRemoveStories = (item) => {
+  const handleRemoveStories = React.useCallback((item) => {
     dispatchStories({
       type: "REMOVE_STORY",
       payload: item,
     });
-  };
+  }, []);
 
+  const getSumComments = (stories) =>
+    console.log("COMPUTING # COMMENTS") ||
+    stories.data.reduce((result, value) => (result += value.num_comments), 0);
+  const numComments = React.useMemo(() => getSumComments(stories), [stories]);
+
+  console.log("APP");
   return (
     <div className="container">
       <h1 className="h1">{title}</h1>
+      <h2>Total comments: {numComments}</h2>
       <SearchForm
         searchTerm={searchTerm}
         onSearchInput={handleSearchInputChange}
@@ -118,7 +131,9 @@ const App = () => {
       </p>
       {stories.isLoading && <p>Fetching data...</p>}
       {stories.isError && <p>Unexpected error!</p>}
-      <List list={stories.data} onRemove={handleRemoveStories} />
+      {!stories.isLoading && (
+        <List list={stories.data} onRemove={handleRemoveStories} />
+      )}
     </div>
   );
 };
@@ -168,7 +183,8 @@ const InputWithLabel = ({
   );
 };
 
-const List = ({ list, onRemove }) => {
+const List = React.memo(({ list, onRemove }) => {
+  console.log("LIST");
   return (
     <ul className="list">
       {list.map((item) => (
@@ -176,7 +192,7 @@ const List = ({ list, onRemove }) => {
       ))}
     </ul>
   );
-};
+});
 
 const Item = ({ item, onRemove }) => {
   return (
