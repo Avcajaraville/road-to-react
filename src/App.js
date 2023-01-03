@@ -13,7 +13,6 @@ const useLocalStorageState = (key, initialValue) => {
     if (!isMounted.current) {
       isMounted.current = true;
     } else {
-      console.log("SETTING LOCAL STORAGE");
       localStorage.setItem(key, value);
     }
   }, [key, value]);
@@ -112,11 +111,9 @@ const App = () => {
   }, []);
 
   const getSumComments = (stories) =>
-    console.log("COMPUTING # COMMENTS") ||
     stories.data.reduce((result, value) => (result += value.num_comments), 0);
   const numComments = React.useMemo(() => getSumComments(stories), [stories]);
 
-  console.log("APP");
   return (
     <div className="container">
       <h1 className="h1">{title}</h1>
@@ -184,7 +181,6 @@ const InputWithLabel = ({
 };
 
 const List = React.memo(({ list, onRemove }) => {
-  console.log("LIST");
   return (
     <ul className="list">
       {list.map((item) => (
@@ -205,7 +201,7 @@ const Item = ({ item, onRemove }) => {
       <span>{item.points}</span>
       <span>
         <button className="button button--small" onClick={() => onRemove(item)}>
-          <Check height="1rem" width="1rem" />
+          <Check />
         </button>
       </span>
     </li>
