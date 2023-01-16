@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ReactComponent as Check } from "./check.svg";
+import { storiesReducer } from "./stories.reducer";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
 
@@ -18,41 +19,6 @@ const useLocalStorageState = (key, initialValue) => {
   }, [key, value]);
 
   return [value, setValue];
-};
-
-const storiesReducer = (state, action) => {
-  switch (action.type) {
-    case "STORIES_FETCHING":
-      return {
-        ...state,
-        isLoading: true,
-        isError: false,
-      };
-    case "STORIES_FETCH_SUCCESS":
-      return {
-        ...state,
-        data: action.payload,
-        isLoading: false,
-        isError: false,
-      };
-    case "REMOVE_STORY":
-      return {
-        ...state,
-        data: state.data.filter(
-          (story) => story.objectID !== action.payload.objectID
-        ),
-        isLoading: false,
-        isError: false,
-      };
-    case "STORIES_FETCH_ERROR":
-      return {
-        ...state,
-        isLoading: false,
-        isError: true,
-      };
-    default:
-      throw new Error(`action ${action.type} not recognized`);
-  }
 };
 
 const getAsyncStories = async (url) => {
