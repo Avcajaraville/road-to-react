@@ -1,5 +1,6 @@
 import * as React from "react";
-import { ReactComponent as Check } from "./check.svg";
+import { Item } from "./Item";
+import { SearchForm } from "./SearchForm";
 import { storiesReducer } from "./stories.reducer";
 
 const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
@@ -101,51 +102,6 @@ const App = () => {
   );
 };
 
-const SearchForm = ({ searchTerm, onSearchInput, onSearchSubmit }) => {
-  return (
-    <form onSubmit={onSearchSubmit} className="search-form">
-      <InputWithLabel
-        id="search"
-        label="Search:"
-        value={searchTerm}
-        onInputChange={onSearchInput}
-      >
-        Search:
-      </InputWithLabel>
-      <button
-        className="button button--large"
-        type="submit"
-        disabled={!searchTerm}
-      >
-        Search
-      </button>
-    </form>
-  );
-};
-
-const InputWithLabel = ({
-  id,
-  value,
-  onInputChange,
-  type = "text",
-  children,
-}) => {
-  return (
-    <>
-      <label htmlFor={id} className="label">
-        {children}
-      </label>
-      <input
-        className="input"
-        id={id}
-        type={type}
-        value={value}
-        onChange={onInputChange}
-      />
-    </>
-  );
-};
-
 const List = React.memo(({ list, onRemove }) => {
   return (
     <ul className="list">
@@ -155,23 +111,5 @@ const List = React.memo(({ list, onRemove }) => {
     </ul>
   );
 });
-
-const Item = ({ item, onRemove }) => {
-  return (
-    <li className="item">
-      <span>
-        <a href={item.url}>{item.title}</a>
-      </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
-      <span>{item.points}</span>
-      <span>
-        <button className="button button--small" onClick={() => onRemove(item)}>
-          <Check />
-        </button>
-      </span>
-    </li>
-  );
-};
 
 export default App;

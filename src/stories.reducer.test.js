@@ -1,14 +1,7 @@
 import { storiesReducer } from "./stories.reducer";
+import { story1 } from "./stories";
 
 describe("storiesReducer", () => {
-  const story1 = {
-    title: "React",
-    url: "http://reactjs.org",
-    author: "Jordan Walke",
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  };
   const story2 = {
     title: "Redux",
     url: "http://redux.js.org",

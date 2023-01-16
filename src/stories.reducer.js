@@ -14,7 +14,6 @@ export const storiesReducer = (state, action) => {
         isError: false,
       };
     case "REMOVE_STORY":
-      console.log("REMOVE_STORY");
       return {
         ...state,
         data: state.data.filter(
