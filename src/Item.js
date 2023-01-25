@@ -11,7 +11,11 @@ export const Item = ({ item, onRemove }) => {
       <span>{item.num_comments}</span>
       <span>{item.points}</span>
       <span>
-        <button className="button button--small" onClick={() => onRemove(item)}>
+        <button
+          className="button button--small"
+          onClick={() => onRemove(item)}
+          aria-label="Dismiss"
+        >
           <Check />
         </button>
       </span>
